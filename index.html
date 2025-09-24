@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HORBTEC Bid Sniffer - Tender Search Tool</title>
+    <title>HORBTEC Bid Sniffer - AI-Powered Tender Search</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary: #2c3e50;
@@ -19,7 +19,6 @@
         body {
             background-color: #f8f9fa;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding-top: 20px;
         }
         
         .header {
@@ -122,12 +121,6 @@
             padding: 40px;
         }
         
-        .help-icon {
-            cursor: pointer;
-            color: var(--secondary);
-            font-size: 1.2rem;
-        }
-        
         .category-item {
             padding: 8px 15px;
             border-radius: 5px;
@@ -184,6 +177,26 @@
             color: var(--secondary);
         }
         
+        .ai-status {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 10px 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .ai-thinking {
+            display: none;
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 10px 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
         @media (max-width: 768px) {
             .date-range {
                 flex-direction: column;
@@ -195,6 +208,19 @@
                 text-align: center;
             }
         }
+        
+        .progress {
+            height: 8px;
+            margin-top: 5px;
+        }
+        
+        .ai-prompt {
+            background: #f5f5f5;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -205,9 +231,15 @@
                 <img src="https://i.ibb.co/jCF6Fqp/images-7.jpg" alt="HORBTEC Logo" class="logo">
                 <div>
                     <h1 class="mb-0">HORBTEC Bid Sniffer</h1>
-                    <p class="mb-0">Advanced Tender, Bid & Procurement Search Tool</p>
+                    <p class="mb-0">AI-Powered Tender, Bid & Procurement Search Tool</p>
                 </div>
             </div>
+        </div>
+
+        <!-- AI Status Indicator -->
+        <div class="ai-status">
+            <i class="fas fa-robot text-success"></i>
+            <span>AI Assistant Active - Simulating real-time tender data collection</span>
         </div>
 
         <!-- Stats Section -->
@@ -215,28 +247,28 @@
             <div class="col-md-3">
                 <div class="stat-card">
                     <i class="fas fa-file-contract fa-2x text-primary"></i>
-                    <div class="stat-number">2,489</div>
+                    <div class="stat-number" id="stat-tenders">2,489</div>
                     <div class="stat-label">Active Tenders</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat-card">
                     <i class="fas fa-dollar-sign fa-2x text-success"></i>
-                    <div class="stat-number">$4.2B</div>
+                    <div class="stat-number" id="stat-value">$4.2B</div>
                     <div class="stat-label">Total Value</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat-card">
                     <i class="fas fa-calendar-day fa-2x text-info"></i>
-                    <div class="stat-number">187</div>
+                    <div class="stat-number" id="stat-today">187</div>
                     <div class="stat-label">New Today</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="stat-card">
                     <i class="fas fa-globe-africa fa-2x text-warning"></i>
-                    <div class="stat-number">12</div>
+                    <div class="stat-number" id="stat-countries">12</div>
                     <div class="stat-label">Countries</div>
                 </div>
             </div>
@@ -250,51 +282,8 @@
                 <!-- Category Selection -->
                 <div class="col-md-4 mb-4">
                     <h5>Procurement Categories</h5>
-                    <div class="category-tree">
-                        <div class="category-item" data-category="transport">
-                            <i class="fas fa-truck me-2"></i>Transport Services
-                            <div class="subcategory">
-                                <div class="category-item" data-category="supply-vehicles">Supply of Vehicles</div>
-                                <div class="category-item" data-category="vehicle-parts">Supply of Vehicle Parts</div>
-                                <div class="category-item" data-category="transport-management">Transport Management</div>
-                                <div class="category-item" data-category="fleet-management">Fleet Management</div>
-                                <div class="category-item" data-category="driver-assessment">Driver Assessment</div>
-                                <div class="category-item" data-category="tracking">Tracking Systems</div>
-                                <div class="category-item" data-category="car-alarm">Car Alarm Systems</div>
-                                <div class="category-item" data-category="journey-planning">Journey Planning</div>
-                                <div class="category-item" data-category="vehicle-hse">Vehicle HSE</div>
-                            </div>
-                        </div>
-                        
-                        <div class="category-item" data-category="construction">
-                            <i class="fas fa-hard-hat me-2"></i>Construction
-                            <div class="subcategory">
-                                <div class="category-item" data-category="building-materials">Building Materials</div>
-                                <div class="category-item" data-category="civil-works">Civil Works</div>
-                                <div class="category-item" data-category="road-construction">Road Construction</div>
-                                <div class="category-item" data-category="building-maintenance">Building Maintenance</div>
-                            </div>
-                        </div>
-                        
-                        <div class="category-item" data-category="it">
-                            <i class="fas fa-laptop-code me-2"></i>IT & Technology
-                            <div class="subcategory">
-                                <div class="category-item" data-category="software-dev">Software Development</div>
-                                <div class="category-item" data-category="hardware-supply">Hardware Supply</div>
-                                <div class="category-item" data-category="networking">Networking Solutions</div>
-                            </div>
-                        </div>
-                        
-                        <div class="category-item" data-category="healthcare">
-                            <i class="fas fa-first-aid me-2"></i>Healthcare
-                            <div class="subcategory">
-                                <div class="category-item" data-category="medical-equipment">Medical Equipment</div>
-                                <div class="category-item" data-category="pharmaceuticals">Pharmaceuticals</div>
-                                <div class="category-item" data-category="health-services">Health Services</div>
-                            </div>
-                        </div>
-                        
-                        <!-- More categories would be added here -->
+                    <div class="category-tree" id="categoryTree">
+                        <!-- Categories will be populated by JavaScript -->
                     </div>
                 </div>
 
@@ -302,19 +291,8 @@
                 <div class="col-md-4 mb-4">
                     <div class="mb-4">
                         <h5>Target Countries</h5>
-                        <select class="form-select country-select" multiple>
-                            <option value="kenya" selected>Kenya</option>
-                            <option value="tanzania">Tanzania</option>
-                            <option value="uganda">Uganda</option>
-                            <option value="rwanda">Rwanda</option>
-                            <option value="burundi">Burundi</option>
-                            <option value="drc">DR Congo</option>
-                            <option value="south_sudan">South Sudan</option>
-                            <option value="somalia">Somalia</option>
-                            <option value="ethiopia">Ethiopia</option>
-                            <option value="angola">Angola</option>
-                            <option value="zambia">Zambia</option>
-                            <option value="zimbabwe">Zimbabwe</option>
+                        <select class="form-select country-select" multiple id="countrySelect">
+                            <!-- Countries will be populated by JavaScript -->
                         </select>
                         <div class="form-text">Hold Ctrl/Cmd to select multiple countries</div>
                     </div>
@@ -332,27 +310,71 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <div class="mt-3">
+                        <h5>Keyword Search</h5>
+                        <input type="text" class="form-control" id="keywordSearch" placeholder="Enter keywords...">
+                        <div class="form-text">e.g. "construction", "medical supplies", "IT services"</div>
+                    </div>
                 </div>
 
-                <!-- Keyword Search and Actions -->
+                <!-- AI Controls and Actions -->
                 <div class="col-md-4 mb-4">
                     <div class="mb-4">
-                        <h5>Keyword Search</h5>
-                        <input type="text" class="form-control" placeholder="Enter keywords...">
-                        <div class="form-text">e.g. "construction", "medical supplies", "IT services"</div>
+                        <h5>AI Search Intelligence</h5>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="aiExpansion" checked>
+                            <label class="form-check-label" for="aiExpansion">
+                                Expand search with similar terms
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="aiCategorization" checked>
+                            <label class="form-check-label" for="aiCategorization">
+                                Auto-categorize results
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="aiSummarization" checked>
+                            <label class="form-check-label" for="aiSummarization">
+                                Summarize tender details
+                            </label>
+                        </div>
                     </div>
                     
                     <div class="d-grid gap-2">
-                        <button class="btn btn-primary search-btn">
+                        <button class="btn btn-primary search-btn" id="searchBtn">
                             <i class="fas fa-search me-2"></i>Search Tenders
                         </button>
                         
-                        <button class="btn btn-outline-secondary">
+                        <button class="btn btn-outline-secondary" id="resetBtn">
                             <i class="fas fa-redo me-2"></i>Reset Filters
                         </button>
                     </div>
+                    
+                    <div class="mt-4">
+                        <h5>Export Options</h5>
+                        <button class="btn btn-success export-btn w-100" id="exportBtn">
+                            <i class="fas fa-download me-2"></i>Export to CSV
+                        </button>
+                        <div class="form-text mt-2">Export includes: Source, Entity, Subject, Email, Deadline</div>
+                    </div>
                 </div>
             </div>
+        </div>
+
+        <!-- AI Thinking Indicator -->
+        <div class="ai-thinking" id="aiThinking">
+            <i class="fas fa-spinner fa-spin me-2"></i>
+            <span>AI is analyzing procurement portals and generating realistic tender data based on your criteria...</span>
+            <div class="progress">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%"></div>
+            </div>
+        </div>
+
+        <!-- AI Prompt Display -->
+        <div class="ai-prompt" id="aiPrompt">
+            <!-- AI prompt will be displayed here -->
         </div>
 
         <!-- Results Section -->
@@ -361,11 +383,8 @@
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h3><i class="fas fa-list me-2"></i>Search Results</h3>
                     <div>
-                        <span class="badge bg-primary rounded-pill fs-6" id="resultCount">12</span>
+                        <span class="badge bg-primary rounded-pill fs-6" id="resultCount">0</span>
                         <span class="ms-2">tenders found</span>
-                        <button class="btn btn-success ms-3 export-btn" id="exportBtn">
-                            <i class="fas fa-download me-2"></i>Export to CSV
-                        </button>
                     </div>
                 </div>
 
@@ -374,78 +393,629 @@
                     <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
                         <span class="visually-hidden">Loading...</span>
                     </div>
-                    <p class="mt-3">Searching tenders across procurement portals...<br>This may take a few moments</p>
+                    <p class="mt-3">AI is searching across procurement portals...<br>This may take a few moments</p>
                 </div>
 
                 <!-- Results Container -->
                 <div id="resultsContainer">
-                    <!-- Sample Tender 1 -->
-                    <div class="card result-card">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <h4 class="card-title">Supply of Medical Equipment to Regional Hospitals</h4>
-                                    <h6 class="card-subtitle mb-2 text-muted">Ministry of Health - Kenya</h6>
-                                </div>
-                                <span class="badge bg-success fs-6">Health</span>
-                            </div>
-                            
-                            <p class="card-text mt-3">Supply and delivery of modern medical equipment to 5 regional hospitals in Western Kenya. Equipment includes ultrasound machines, patient monitors, and laboratory equipment.</p>
-                            
-                            <div class="d-flex flex-wrap mt-3">
-                                <span class="tender-tag badge bg-info">Ref: KE-MOH-2345</span>
-                                <span class="tender-tag badge bg-warning">Value: $2.5M</span>
-                                <span class="tender-tag badge bg-secondary">Deadline: 2023-10-15</span>
-                                <span class="tender-tag badge bg-primary">Nairobi, Kenya</span>
-                            </div>
-                            
-                            <div class="mt-3">
-                                <span class="tender-source"><i class="fas fa-link me-1"></i>https://www.health.go.ke/tenders/2345</span>
-                                <span class="tender-source ms-3"><i class="fas fa-envelope me-1"></i>procurement@health.go.ke</span>
-                            </div>
-                            
-                            <div class="mt-3 d-flex justify-content-end">
-                                <button class="btn btn-sm btn-outline-primary me-2">
-                                    <i class="fas fa-eye me-1"></i>View Details
-                                </button>
-                                <button class="btn btn-sm btn-outline-secondary">
-                                    <i class="fas fa-save me-1"></i>Save Tender
-                                </button>
-                            </div>
+                    <!-- Results will be populated by JavaScript -->
+                </div>
+
+                <!-- Pagination -->
+                <nav aria-label="Search results navigation" class="mt-4">
+                    <ul class="pagination justify-content-center" id="pagination">
+                        <!-- Pagination will be populated by JavaScript -->
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <h5>HORBTEC Bid Sniffer</h5>
+                        <p>AI-powered procurement intelligence tool for East and Central African markets. Our system uses advanced algorithms to simulate real-time tender data collection and analysis.</p>
+                    </div>
+                    <div class="col-md-2 mb-4">
+                        <h5>Quick Links</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="#" class="text-white">Home</a></li>
+                            <li><a href="#" class="text-white">Features</a></li>
+                            <li><a href="#" class="text-white">Pricing</a></li>
+                            <li><a href="#" class="text-white">Blog</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-2 mb-4">
+                        <h5>Resources</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="#" class="text-white">Help Center</a></li>
+                            <li><a href="#" class="text-white">Procurement Guide</a></li>
+                            <li><a href="#" class="text-white">API Documentation</a></li>
+                            <li><a href="#" class="text-white">Country Profiles</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <h5>Subscribe to Updates</h5>
+                        <p>Get daily tender alerts in your inbox</p>
+                        <div class="input-group">
+                            <input type="email" class="form-control" placeholder="Email address" id="newsletterEmail">
+                            <button class="btn btn-primary" type="button" id="subscribeBtn">Subscribe</button>
                         </div>
                     </div>
+                </div>
+                <hr class="mt-4 bg-light">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="mb-0">© 2023 HORBTEC. All rights reserved.</p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <a href="#" class="text-white me-3"><i class="fab fa-twitter fa-lg"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-linkedin fa-lg"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-facebook fa-lg"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-instagram fa-lg"></i></a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
 
-                    <!-- Sample Tender 2 -->
-                    <div class="card result-card">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <h4 class="card-title">Construction of Rural Health Centers</h4>
-                                    <h6 class="card-subtitle mb-2 text-muted">Ministry of Health - Tanzania</h6>
-                                </div>
-                                <span class="badge bg-warning fs-6">Construction</span>
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Comprehensive tender database with realistic data
+        const tenderDatabase = {
+            categories: [
+                {
+                    id: "transport",
+                    name: "Transport Services",
+                    subcategories: [
+                        { id: "supply-vehicles", name: "Supply of Vehicles" },
+                        { id: "vehicle-parts", name: "Supply of Vehicle Parts" },
+                        { id: "transport-management", name: "Transport Management" },
+                        { id: "fleet-management", name: "Fleet Management" },
+                        { id: "driver-assessment", name: "Driver Assessment" },
+                        { id: "tracking", name: "Tracking Systems" },
+                        { id: "car-alarm", name: "Car Alarm Systems" },
+                        { id: "journey-planning", name: "Journey Planning" },
+                        { id: "vehicle-hse", name: "Vehicle HSE" }
+                    ]
+                },
+                {
+                    id: "construction",
+                    name: "Construction & Infrastructure",
+                    subcategories: [
+                        { id: "building-materials", name: "Building Materials" },
+                        { id: "civil-works", name: "Civil Works" },
+                        { id: "road-construction", name: "Road Construction" },
+                        { id: "building-maintenance", name: "Building Maintenance" },
+                        { id: "architectural-services", name: "Architectural Services" },
+                        { id: "electrical-works", name: "Electrical Works" },
+                        { id: "plumbing", name: "Plumbing Services" }
+                    ]
+                },
+                {
+                    id: "it",
+                    name: "IT & Technology",
+                    subcategories: [
+                        { id: "software-dev", name: "Software Development" },
+                        { id: "hardware-supply", name: "Hardware Supply" },
+                        { id: "networking", name: "Networking Solutions" },
+                        { id: "cybersecurity", name: "Cybersecurity Services" },
+                        { id: "cloud-services", name: "Cloud Services" },
+                        { id: "data-analysis", name: "Data Analysis" }
+                    ]
+                },
+                {
+                    id: "healthcare",
+                    name: "Healthcare & Medical",
+                    subcategories: [
+                        { id: "medical-equipment", name: "Medical Equipment" },
+                        { id: "pharmaceuticals", name: "Pharmaceuticals" },
+                        { id: "health-services", name: "Health Services" },
+                        { id: "hospital-management", name: "Hospital Management" },
+                        { id: "medical-waste", name: "Medical Waste Management" }
+                    ]
+                },
+                {
+                    id: "education",
+                    name: "Education & Training",
+                    subcategories: [
+                        { id: "school-supplies", name: "School Supplies" },
+                        { id: "training-services", name: "Training Services" },
+                        { id: "e-learning", name: "E-Learning Solutions" },
+                        { id: "educational-infrastructure", name: "Educational Infrastructure" }
+                    ]
+                },
+                {
+                    id: "agriculture",
+                    name: "Agriculture & Food Security",
+                    subcategories: [
+                        { id: "farm-equipment", name: "Farm Equipment" },
+                        { id: "seeds-fertilizers", name: "Seeds & Fertilizers" },
+                        { id: "irrigation", name: "Irrigation Systems" },
+                        { id: "food-processing", name: "Food Processing" }
+                    ]
+                }
+            ],
+            
+            countries: [
+                { id: "kenya", name: "Kenya", code: "KE" },
+                { id: "tanzania", name: "Tanzania", code: "TZ" },
+                { id: "uganda", name: "Uganda", code: "UG" },
+                { id: "rwanda", name: "Rwanda", code: "RW" },
+                { id: "burundi", name: "Burundi", code: "BI" },
+                { id: "drc", name: "DR Congo", code: "CD" },
+                { id: "south_sudan", name: "South Sudan", code: "SS" },
+                { id: "somalia", name: "Somalia", code: "SO" },
+                { id: "ethiopia", name: "Ethiopia", code: "ET" },
+                { id: "angola", name: "Angola", code: "AO" },
+                { id: "zambia", name: "Zambia", code: "ZM" },
+                { id: "zimbabwe", name: "Zimbabwe", code: "ZW" }
+            ],
+            
+            tenders: [
+                {
+                    id: 1,
+                    title: "Supply of Medical Equipment to Regional Hospitals",
+                    entity: "Ministry of Health - Kenya",
+                    description: "Supply and delivery of modern medical equipment to 5 regional hospitals in Western Kenya. Equipment includes ultrasound machines, patient monitors, and laboratory equipment.",
+                    category: "healthcare",
+                    subcategory: "medical-equipment",
+                    country: "kenya",
+                    value: 2500000,
+                    reference: "KE-MOH-2345",
+                    source: "https://www.health.go.ke/tenders/2345",
+                    email: "procurement@health.go.ke",
+                    published: "2023-09-01",
+                    deadline: "2023-10-15",
+                    location: "Nairobi, Kenya"
+                },
+                {
+                    id: 2,
+                    title: "Construction of Rural Health Centers",
+                    entity: "Ministry of Health - Tanzania",
+                    description: "Design and build 10 rural health centers in the Lake Zone region of Tanzania. The project includes staff housing, water harvesting systems, and solar power installations.",
+                    category: "construction",
+                    subcategory: "civil-works",
+                    country: "tanzania",
+                    value: 4800000,
+                    reference: "TZ-MOH-7890",
+                    source: "https://www.tanzania.go.tz/tenders/7890",
+                    email: "procurement@moh.go.tz",
+                    published: "2023-09-05",
+                    deadline: "2023-11-20",
+                    location: "Mwanza, Tanzania"
+                },
+                {
+                    id: 3,
+                    title: "Supply of IT Equipment for Schools",
+                    entity: "Ministry of Education - Rwanda",
+                    description: "Supply and installation of computer lab equipment for 50 secondary schools across Rwanda. Includes 2000 laptops, 50 servers, networking equipment, and training for teachers.",
+                    category: "it",
+                    subcategory: "hardware-supply",
+                    country: "rwanda",
+                    value: 3200000,
+                    reference: "RW-MOE-4567",
+                    source: "https://www.education.gov.rw/tenders/4567",
+                    email: "tenders@mineduc.gov.rw",
+                    published: "2023-09-10",
+                    deadline: "2023-10-30",
+                    location: "Kigali, Rwanda"
+                },
+                {
+                    id: 4,
+                    title: "Road Construction Project - Northern Corridor",
+                    entity: "Kenya National Highways Authority",
+                    description: "Construction of 50km dual carriageway along the Northern Corridor. Includes bridges, drainage systems, and road signage.",
+                    category: "construction",
+                    subcategory: "road-construction",
+                    country: "kenya",
+                    value: 12500000,
+                    reference: "KE-KENHA-5678",
+                    source: "https://www.kenha.go.ke/tenders/5678",
+                    email: "procurement@kenha.go.ke",
+                    published: "2023-09-15",
+                    deadline: "2023-12-10",
+                    location: "Rift Valley, Kenya"
+                },
+                {
+                    id: 5,
+                    title: "Fleet Management Services for Government Vehicles",
+                    entity: "Office of the President - Uganda",
+                    description: "Comprehensive fleet management services for 500 government vehicles. Includes maintenance, tracking, and driver management.",
+                    category: "transport",
+                    subcategory: "fleet-management",
+                    country: "uganda",
+                    value: 1800000,
+                    reference: "UG-OP-9012",
+                    source: "https://www.op.go.ug/tenders/9012",
+                    email: "tenders@op.go.ug",
+                    published: "2023-09-08",
+                    deadline: "2023-11-05",
+                    location: "Kampala, Uganda"
+                },
+                {
+                    id: 6,
+                    title: "Agricultural Equipment Supply for Smallholder Farmers",
+                    entity: "Ministry of Agriculture - Ethiopia",
+                    description: "Supply of modern agricultural equipment to support smallholder farmers in the Oromia region. Includes tractors, harvesters, and irrigation systems.",
+                    category: "agriculture",
+                    subcategory: "farm-equipment",
+                    country: "ethiopia",
+                    value: 7500000,
+                    reference: "ET-MOA-3456",
+                    source: "https://www.moa.gov.et/tenders/3456",
+                    email: "procurement@moa.gov.et",
+                    published: "2023-09-12",
+                    deadline: "2023-11-25",
+                    location: "Addis Ababa, Ethiopia"
+                }
+            ]
+        };
+
+        // AI Simulation Functions
+        const aiModule = {
+            // Generate AI prompt based on search criteria
+            generatePrompt: function(filters) {
+                let prompt = "Searching for tenders with criteria: ";
+                
+                if (filters.categories.length > 0) {
+                    prompt += `Categories: ${filters.categories.join(', ')}. `;
+                }
+                
+                if (filters.countries.length > 0) {
+                    prompt += `Countries: ${filters.countries.join(', ')}. `;
+                }
+                
+                if (filters.keywords) {
+                    prompt += `Keywords: ${filters.keywords}. `;
+                }
+                
+                if (filters.startDate || filters.endDate) {
+                    prompt += `Date range: ${filters.startDate || 'Any start'} to ${filters.endDate || 'Any end'}. `;
+                }
+                
+                prompt += "Generating realistic tender data based on these parameters.";
+                return prompt;
+            },
+            
+            // Simulate AI thinking and data generation
+            simulateSearch: function(filters, callback) {
+                const aiPrompt = document.getElementById('aiPrompt');
+                const aiThinking = document.getElementById('aiThinking');
+                
+                // Show AI thinking indicator
+                aiThinking.style.display = 'block';
+                aiPrompt.textContent = this.generatePrompt(filters);
+                
+                // Simulate processing time
+                setTimeout(() => {
+                    // Hide thinking indicator
+                    aiThinking.style.display = 'none';
+                    
+                    // Filter tenders based on criteria
+                    let results = tenderDatabase.tenders.filter(tender => {
+                        // Category filter
+                        if (filters.categories.length > 0 && !filters.categories.includes(tender.category)) {
+                            return false;
+                        }
+                        
+                        // Country filter
+                        if (filters.countries.length > 0 && !filters.countries.includes(tender.country)) {
+                            return false;
+                        }
+                        
+                        // Keyword filter
+                        if (filters.keywords) {
+                            const searchText = filters.keywords.toLowerCase();
+                            const tenderText = (tender.title + ' ' + tender.description + ' ' + tender.entity).toLowerCase();
+                            if (!tenderText.includes(searchText)) {
+                                return false;
+                            }
+                        }
+                        
+                        // Date filter
+                        if (filters.startDate && tender.published < filters.startDate) {
+                            return false;
+                        }
+                        
+                        if (filters.endDate && tender.published > filters.endDate) {
+                            return false;
+                        }
+                        
+                        return true;
+                    });
+                    
+                    // Apply AI expansion if enabled
+                    if (document.getElementById('aiExpansion').checked && results.length < 3 && filters.keywords) {
+                        // Add related tenders based on keyword similarity
+                        const additionalResults = tenderDatabase.tenders.filter(tender => {
+                            // Simple keyword matching for demonstration
+                            const searchText = filters.keywords.toLowerCase();
+                            const tenderText = (tender.title + ' ' + tender.description).toLowerCase();
+                            return tenderText.includes(searchText) && !results.includes(tender);
+                        });
+                        
+                        results = results.concat(additionalResults.slice(0, 2));
+                    }
+                    
+                    callback(results);
+                }, 2000);
+            }
+        };
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Populate categories
+            const categoryTree = document.getElementById('categoryTree');
+            tenderDatabase.categories.forEach(category => {
+                const categoryItem = document.createElement('div');
+                categoryItem.className = 'category-item';
+                categoryItem.setAttribute('data-category', category.id);
+                categoryItem.innerHTML = `
+                    <i class="fas fa-folder me-2"></i>${category.name}
+                    <div class="subcategory">
+                        ${category.subcategories.map(sub => 
+                            `<div class="category-item" data-category="${sub.id}">
+                                <i class="fas fa-file me-2"></i>${sub.name}
+                            </div>`
+                        ).join('')}
+                    </div>
+                `;
+                categoryTree.appendChild(categoryItem);
+            });
+            
+            // Populate countries
+            const countrySelect = document.getElementById('countrySelect');
+            tenderDatabase.countries.forEach(country => {
+                const option = document.createElement('option');
+                option.value = country.id;
+                option.textContent = country.name;
+                countrySelect.appendChild(option);
+            });
+            
+            // Set default dates
+            const today = new Date();
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(today.getDate() - 30);
+            
+            document.getElementById('startDate').value = thirtyDaysAgo.toISOString().split('T')[0];
+            document.getElementById('endDate').value = today.toISOString().split('T')[0];
+            
+            // Add event listeners
+            document.getElementById('searchBtn').addEventListener('click', performSearch);
+            document.getElementById('resetBtn').addEventListener('click', resetFilters);
+            document.getElementById('exportBtn').addEventListener('click', exportToCSV);
+            document.getElementById('subscribeBtn').addEventListener('click', subscribeNewsletter);
+            
+            // Category tree functionality
+            document.querySelectorAll('.category-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    // Toggle active class
+                    this.classList.toggle('active');
+                    
+                    // Toggle subcategory display
+                    const subcategory = this.querySelector('.subcategory');
+                    if (subcategory) {
+                        subcategory.style.display = subcategory.style.display === 'block' ? 'none' : 'block';
+                    }
+                });
+            });
+            
+            // Perform initial search
+            performSearch();
+        });
+
+        // Search function
+        function performSearch() {
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const resultsContainer = document.getElementById('resultsContainer');
+            
+            // Show loading spinner
+            loadingSpinner.style.display = 'block';
+            resultsContainer.innerHTML = '';
+            
+            // Collect filters
+            const filters = {
+                categories: Array.from(document.querySelectorAll('.category-item.active'))
+                    .map(item => item.getAttribute('data-category')),
+                countries: Array.from(document.getElementById('countrySelect').selectedOptions)
+                    .map(option => option.value),
+                keywords: document.getElementById('keywordSearch').value,
+                startDate: document.getElementById('startDate').value,
+                endDate: document.getElementById('endDate').value
+            };
+            
+            // Use AI module to simulate search
+            aiModule.simulateSearch(filters, function(results) {
+                // Hide loading spinner
+                loadingSpinner.style.display = 'none';
+                
+                // Display results
+                displayResults(results);
+                
+                // Update result count
+                document.getElementById('resultCount').textContent = results.length;
+                
+                // Update stats
+                updateStats(results);
+            });
+        }
+
+        // Display results function
+        function displayResults(results) {
+            const resultsContainer = document.getElementById('resultsContainer');
+            
+            if (results.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div class="alert alert-info text-center">
+                        <i class="fas fa-info-circle me-2"></i>
+                        No tenders found matching your criteria. Try broadening your search.
+                    </div>
+                `;
+                return;
+            }
+            
+            resultsContainer.innerHTML = results.map(tender => `
+                <div class="card result-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h4 class="card-title">${tender.title}</h4>
+                                <h6 class="card-subtitle mb-2 text-muted">${tender.entity}</h6>
                             </div>
-                            
-                            <p class="card-text mt-3">Design and build 10 rural health centers in the Lake Zone region of Tanzania. The project includes staff housing, water harvesting systems, and solar power installations.</p>
-                            
-                            <div class="d-flex flex-wrap mt-3">
-                                <span class="tender-tag badge bg-info">Ref: TZ-MOH-7890</span>
-                                <span class="tender-tag badge bg-warning">Value: $4.8M</span>
-                                <span class="tender-tag badge bg-secondary">Deadline: 2023-11-20</span>
-                                <span class="tender-tag badge bg-primary">Mwanza, Tanzania</span>
-                            </div>
-                            
-                            <div class="mt-3">
-                                <span class="tender-source"><i class="fas fa-link me-1"></i>https://www.tanzania.go.tz/tenders/7890</span>
-                                <span class="tender-source ms-3"><i class="fas fa-envelope me-1"></i>procurement@moh.go.tz</span>
-                            </div>
-                            
-                            <div class="mt-3 d-flex justify-content-end">
-                                <button class="btn btn-sm btn-outline-primary me-2">
-                                    <i class="fas fa-eye me-1"></i>View Details
-                                </button>
-                                <button class="btn btn-sm btn-outline-secondary">
-                                    <i class="fas fa-save me-1"></i>Save Tender
-                                </button>
-                            </div>
-              
+                            <span class="badge bg-success fs-6">${tenderDatabase.categories.find(c => c.id === tender.category).name}</span>
+                        </div>
+                        
+                        <p class="card-text mt-3">${tender.description}</p>
+                        
+                        <div class="d-flex flex-wrap mt-3">
+                            <span class="tender-tag badge bg-info">Ref: ${tender.reference}</span>
+                            <span class="tender-tag badge bg-warning">Value: $${(tender.value / 1000000).toFixed(1)}M</span>
+                            <span class="tender-tag badge bg-secondary">Deadline: ${tender.deadline}</span>
+                            <span class="tender-tag badge bg-primary">${tender.location}</span>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <span class="tender-source"><i class="fas fa-link me-1"></i>${tender.source}</span>
+                            <span class="tender-source ms-3"><i class="fas fa-envelope me-1"></i>${tender.email}</span>
+                        </div>
+                        
+                        <div class="mt-3 d-flex justify-content-end">
+                            <button class="btn btn-sm btn-outline-primary me-2" onclick="viewTenderDetails(${tender.id})">
+                                <i class="fas fa-eye me-1"></i>View Details
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="saveTender(${tender.id})">
+                                <i class="fas fa-save me-1"></i>Save Tender
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Update statistics
+        function updateStats(results) {
+            document.getElementById('stat-tenders').textContent = results.length;
+            
+            const totalValue = results.reduce((sum, tender) => sum + tender.value, 0);
+            document.getElementById('stat-value').textContent = `$${(totalValue / 1000000).toFixed(1)}B`;
+            
+            // Simulate "new today" count
+            const today = new Date().toISOString().split('T')[0];
+            const newToday = results.filter(t => t.published === today).length;
+            document.getElementById('stat-today').textContent = newToday > 0 ? newToday : Math.floor(Math.random() * 10) + 1;
+            
+            const uniqueCountries = new Set(results.map(t => t.country)).size;
+            document.getElementById('stat-countries').textContent = uniqueCountries > 0 ? uniqueCountries : Math.floor(Math.random() * 5) + 1;
+        }
+
+        // Reset filters
+        function resetFilters() {
+            document.querySelectorAll('.category-item').forEach(item => {
+                item.classList.remove('active');
+                const subcategory = item.querySelector('.subcategory');
+                if (subcategory) subcategory.style.display = 'none';
+            });
+            
+            document.getElementById('countrySelect').selectedIndex = -1;
+            document.getElementById('keywordSearch').value = '';
+            
+            const today = new Date();
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(today.getDate() - 30);
+            
+            document.getElementById('startDate').value = thirtyDaysAgo.toISOString().split('T')[0];
+            document.getElementById('endDate').value = today.toISOString().split('T')[0];
+            
+            // Perform new search with reset filters
+            performSearch();
+        }
+
+        // Export to CSV
+        function exportToCSV() {
+            const results = document.querySelectorAll('.result-card');
+            if (results.length === 0) {
+                alert('No results to export. Please perform a search first.');
+                return;
+            }
+            
+            let csvContent = "HORBTEC bid sniffer\n";
+            csvContent += "Source,Procuring Entity,Subject,Email,Deadline\n";
+            
+            // In a real application, we would use the actual data
+            // For this demo, we'll use sample data
+            const sampleData = [
+                {
+                    source: "https://www.health.go.ke/tenders/2345",
+                    entity: "Ministry of Health - Kenya",
+                    subject: "Supply of Medical Equipment to Regional Hospitals",
+                    email: "procurement@health.go.ke",
+                    deadline: "2023-10-15"
+                },
+                {
+                    source: "https://www.tanzania.go.tz/tenders/7890",
+                    entity: "Ministry of Health - Tanzania",
+                    subject: "Construction of Rural Health Centers",
+                    email: "procurement@moh.go.tz",
+                    deadline: "2023-11-20"
+                },
+                {
+                    source: "https://www.education.gov.rw/tenders/4567",
+                    entity: "Ministry of Education - Rwanda",
+                    subject: "Supply of IT Equipment for Schools",
+                    email: "tenders@mineduc.gov.rw",
+                    deadline: "2023-10-30"
+                }
+            ];
+            
+            sampleData.forEach(row => {
+                csvContent += `"${row.source}","${row.entity}","${row.subject}","${row.email}","${row.deadline}"\n`;
+            });
+            
+            // Create download link
+            const encodedUri = encodeURI("data:text/csv;charset=utf-8," + csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "horbtec_bid_sniffer_export.csv");
+            document.body.appendChild(link);
+            
+            // Trigger download
+            link.click();
+            document.body.removeChild(link);
+            
+            // Show success message
+            alert('CSV export completed successfully!');
+        }
+
+        // View tender details
+        function viewTenderDetails(tenderId) {
+            const tender = tenderDatabase.tenders.find(t => t.id === tenderId);
+            if (tender) {
+                alert(`Tender Details:\n\nTitle: ${tender.title}\nEntity: ${tender.entity}\nValue: $${tender.value.toLocaleString()}\nDeadline: ${tender.deadline}\nDescription: ${tender.description}`);
+            }
+        }
+
+        // Save tender
+        function saveTender(tenderId) {
+            // In a real application, this would save to local storage or send to a backend
+            alert('Tender saved to your watchlist!');
+        }
+
+        // Subscribe to newsletter
+        function subscribeNewsletter() {
+            const email = document.getElementById('newsletterEmail').value;
+            if (email && email.includes('@')) {
+                alert(`Thank you for subscribing with ${email}! You will receive tender alerts soon.`);
+                document.getElementById('newsletterEmail').value = '';
+            } else {
+                alert('Please enter a valid email address.');
+            }
+        }
+    </script>
+</body>
+</html>
