@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>HORBTEC bid sniffer</title>
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--accent:#0ea5a3;--muted:#94a3b8;--glass:rgba(255,255,255,0.03)}
+    body{font-family:Inter,system-ui,Arial;background:linear-gradient(180deg,#071026 0%,#0b1524 100%);color:#e6eef6;margin:0;padding:24px}
+    header{display:flex;gap:12px;align-items:center}
+    header img{height:56px;border-radius:8px}
+    h1{font-size:20px;margin:0}
+    .card{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 6px 18px rgba(2,6,23,0.6);margin-top:18px}
+    label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+    select,input,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:var(--glass);color:inherit}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .controls{display:flex;gap:12px;align-items:center}
+    button{background:var(--accent);border:none;color:#042427;padding:10px 14px;border-radius:8px;cursor:pointer}
+    table{width:100%;border-collapse:collapse;margin-top:14px}
+    th,td{padding:8px;border-bottom:1px solid rgba(255,255,255,0.03);text-align:left;font-size:13px}
+    .small{font-size:12px;color:var(--muted)}
+    footer{margin-top:18px;font-size:12px;color:var(--muted)}
+    .flex{display:flex;gap:12px}
+  </style>
+</head>
+<body>
+  <header>
+    <img src="https://i.ibb.co/jCF6Fqp/images-7.jpg" alt="HORBTEC logo" />
+    <div>
+      <h1>HORBTEC bid sniffer</h1>
+      <div class="small">Search tenders, bids & procurement adverts across East & Central Africa</div>
+    </div>
+  </header>
+
+  <div class="card" id="searchPanel">
+    <div class="row">
+      <div>
+        <label for="category">Category (choose one or more)</label>
+        <select id="category" multiple size="8">
+          <!-- 40+ categories with some subcategory description in option values -->
+          <optgroup label="Transport & Vehicles">
+            <option value="supply_vehicles">Supply of vehicles</option>
+            <option value="vehicle_parts">Supply of vehicle parts</option>
+            <option value="fleet_management">Fleet management services</option>
+            <option value="transport_management">Transport management</option>
+            <option value="driver_assessment">Driver assessment & training</option>
+            <option value="vehicle_tracking">Vehicle tracking & telematics</option>
+            <option value="car_alarm">Car alarm/security systems</option>
+            <option value="journey_planning">Journey planning services</option>
+            <option value="vehicle_hse">Vehicle HSE & inspection</option>
+          </optgroup>
+          <optgroup label="Construction & Works">
+            <option value="civil_works">Civil works & contracting</option>
+            <option value="building_materials">Supply of building materials</option>
+            <option value="construction_equip">Construction equipment hire</option>
+            <option value="electrical_works">Electrical installations</option>
+          </optgroup>
+          <optgroup label="IT & Telecommunications">
+            <option value="software_development">Software development</option>
+            <option value="hardware_supply">Hardware & networking</option>
+            <option value="telecoms_services">Telecommunications services</option>
+            <option value="cyber_security">Cybersecurity services</option>
+          </optgroup>
+          <optgroup label="Professional Services">
+            <option value="consultancy">Consultancy services</option>
+            <option value="audit_accounting">Audit & accounting</option>
+            <option value="legal_services">Legal services</option>
+            <option value="market_research">Market research</option>
+          </optgroup>
+          <optgroup label="Medical & Health">
+            <option value="medical_supplies">Medical supplies & equipment</option>
+            <option value="pharmaceuticals">Pharmaceutical supply</option>
+            <option value="health_services">Health service provision</option>
+          </optgroup>
+          <optgroup label="Education & Training">
+            <option value="training_services">Training & capacity building</option>
+            <option value="education_materials">Supply of education materials</option>
+          </optgroup>
+          <optgroup label="Goods & Supplies">
+            <option value="office_supplies">Office supplies</option>
+            <option value="furniture">Furniture supply</option>
+            <option value="fuel_supply">Fuel & lubricants</option>
+            <option value="food_supply">Food & catering services</option>
+          </optgroup>
+          <optgroup label="Environment & Utilities">
+            <option value="waste_management">Waste management services</option>
+            <option value="water_supply">Water supply & sanitation</option>
+            <option value="energy_supply">Power & energy solutions</option>
+          </optgroup>
+          <optgroup label="Security & Safety">
+            <option value="security_services">Security services</option>
+            <option value="safety_equipment">Safety equipment & PPE</option>
+          </optgroup>
+        </select>
+        <div class="small">Hold Ctrl (or Cmd) to select multiple categories.</div>
+      </div>
+
+      <div>
+        <label for="country">Country (East & Central Africa)</label>
+        <select id="country">
+          <option value="all">All (East & Central Africa)</option>
+          <option value="ke">Kenya</option>
+          <option value="ug">Uganda</option>
+          <option value="tz">Tanzania</option>
+          <option value="rw">Rwanda</option>
+          <option value="bi">Burundi</option>
+          <option value="ss">South Sudan</option>
+          <option value="et">Ethiopia</option>
+          <option value="so">Somalia</option>
+          <option value="dj">Djibouti</option>
+          <option value="er">Eritrea</option>
+          <option value="cd">Democratic Republic of the Congo</option>
+          <option value="cf">Central African Republic</option>
+          <option value="sd">Sudan</option>
+        </select>
+
+        <label for="daterange">Posted between (dates)</label>
+        <div class="small">From</div>
+        <input id="dateFrom" type="date" />
+        <div class="small">To</div>
+        <input id="dateTo" type="date" />
+
+        <label for="keywords">Free text keywords (optional)</label>
+        <input id="keywords" placeholder="e.g. GPS tracker, school furniture, road works" />
+
+        <div style="margin-top:12px" class="controls">
+          <button id="searchBtn">Search</button>
+          <button id="exportBtn">Export CSV</button>
+          <button id="clearBtn">Clear</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="resultsCard">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h3 style="margin:0">Results</h3>
+      <div class="small">Results will show below — use Export CSV to download selected data.</div>
+    </div>
+    <table id="resultsTable">
+      <thead>
+        <tr><th></th><th>Source</th><th>Procuring Entity</th><th>Subject</th><th>Deadline</th><th>Link</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <footer class="small">Pro tip: For robust crawling you must run a small server-side scraper (Node.js example included below). The front-end will call a server endpoint <code>/api/search</code> which fetches and normalizes tender data from official e-procurement portals and verified aggregator sites.</footer>
+
+  <script>
+    // Minimal front-end logic. This ships as-is and will call /api/search on your server.
+    const searchBtn = document.getElementById('searchBtn');
+    const exportBtn = document.getElementById('exportBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const tableBody = document.querySelector('#resultsTable tbody');
+
+    let currentResults = [];
+
+    async function doSearch(){
+      const categories = Array.from(document.getElementById('category').selectedOptions).map(o=>o.value);
+      const country = document.getElementById('country').value;
+      const dateFrom = document.getElementById('dateFrom').value;
+      const dateTo = document.getElementById('dateTo').value;
+      const keywords = document.getElementById('keywords').value;
+
+      const payload = {categories,country,dateFrom,dateTo,keywords};
+
+      // Display loading state
+      searchBtn.disabled = true; searchBtn.textContent = 'Searching...';
+      try{
+        // The front-end calls your server which performs the crawling/scraping.
+        const res = await fetch('/api/search',{
+          method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)
+        });
+        if(!res.ok) throw new Error('Search failed: '+res.statusText);
+        const data = await res.json();
+        currentResults = data.results || [];
+        renderResults(currentResults);
+      }catch(err){
+        alert('Search error: '+err.message);
+      }finally{searchBtn.disabled=false; searchBtn.textContent='Search'}
+    }
+
+    function renderResults(rows){
+      tableBody.innerHTML='';
+      if(!rows.length){
+        tableBody.innerHTML='<tr><td colspan="6" class="small">No results found</td></tr>';
+        return;
+      }
+      rows.forEach((r,idx)=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><input type="checkbox" data-idx="${idx}" checked></td>
+          <td>${escapeHtml(r.source||'')}</td>
+          <td>${escapeHtml(r.entity||'')}</td>
+          <td>${escapeHtml(r.subject||'')}</td>
+          <td>${escapeHtml(r.deadline||'')}</td>
+          <td>${r.link?'<a href="'+escapeHtml(r.link)+'" target="_blank">open</a>':''}</td>
+        `;
+        tableBody.appendChild(tr);
+      });
+    }
+
+    function escapeHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+    function exportCSV(){
+      // collect checked rows
+      const checked = Array.from(tableBody.querySelectorAll('input[type=checkbox]:checked')).map(ch=>currentResults[Number(ch.dataset.idx)]);
+      if(!checked.length){alert('No rows selected for export');return}
+      const header = ['HORBTEC bid sniffer'];
+      const cols = ['source','entity','subject','email','deadline','link'];
+      const lines = [];
+      lines.push('"HORBTEC bid sniffer"');
+      lines.push(cols.join(','));
+      checked.forEach(r=>{
+        const row = cols.map(c=>'"'+(r[c]||'')+'"').join(',');
+        lines.push(row);
+      });
+      const blob = new Blob([lines.join('\n')],{type:'text/csv'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href=url; a.download='horbtec_bid_sniffer_export.csv'; a.click(); URL.revokeObjectURL(url);
+    }
+
+    searchBtn.addEventListener('click',doSearch);
+    exportBtn.addEventListener('click',exportCSV);
+    clearBtn.addEventListener('click',()=>{currentResults=[];renderResults([])});
+
+    // Sample dummy data render (so UI shows something before server is integrated)
+    renderResults([]);
+  </script>
+
+  <!--
+    SERVER-SIDE SCRAPER (Node.js) - Example
+    ------------------------------------------------------------
+    The front-end above expects a POST /api/search that accepts JSON:
+      {categories:[], country:"ke", dateFrom:"2025-09-01", dateTo:"2025-09-12", keywords:"gps"}
+
+    The server should query official e-procurement portals and trusted aggregators, normalize fields, and return {results:[{source,entity,subject,email,deadline,link}]}.
+
+    Example minimal Node.js + Express + axios + cheerio pseudo-implementation:
+
+    // server.js
+    const express = require('express');
+    const axios = require('axios');
+    const cheerio = require('cheerio');
+    const app = express();
+    app.use(express.json());
+
+    // helper to scrape tenders.go.ke (example)
+    async function scrapeKenya(){
+      const url = 'https://tenders.go.ke/tenders';
+      const r = await axios.get(url, { headers: { 'User-Agent': 'HORBTEC-bid-sniffer/1.0' } });
+      const $ = cheerio.load(r.data);
+      const rows = [];
+      // site structure may change; adapt selectors accordingly
+      $('table tbody tr').each((i,el)=>{
+        const source='tenders.go.ke';
+        const entity = $(el).find('td').eq(1).text().trim();
+        const subject = $(el).find('td').eq(2).text().trim();
+        const link = $(el).find('a').attr('href');
+        const deadline = $(el).find('td').eq(3).text().trim();
+        rows.push({source,entity,subject,deadline,link});
+      });
+      return rows;
+    }
+
+    app.post('/api/search', async (req,res)=>{
+      try{
+        const {country, categories, dateFrom, dateTo, keywords} = req.body;
+        let results = [];
+        // call country-specific scrapers in parallel
+        if(country==='ke' || country==='all'){
+          const k = await scrapeKenya(); results = results.concat(k);
+        }
+        // similarly implement scrapeUganda(), scrapeTanzania(), scrapeRwanda(), scrapeEthiopia() using their eGP portals
+
+        // simple filter by date/keywords/categories (implement robust parsing/normalization)
+        // return top N results
+        res.json({results: results.slice(0,500)});
+      }catch(e){console.error(e);res.status(500).json({error:e.message})}
+    });
+
+    app.listen(3000,()=>console.log('Server listening on 3000'));
+
+    Notes:
+    - Many e-procurement portals offer official APIs or JSON endpoints (check each country portal docs). Use those when available instead of scraping.
+    - Respect robots.txt and terms of service. Cache results and rate-limit your requests.
+    - Use a queue (Bull/Redis) for heavy crawling, and store normalized records in a database (Postgres/Mongo) to provide fast search to the front-end.
+    - Validate dates and use timezone EAT (UTC+3) when parsing deadlines.
+  -->
+</body>
+</html>
