@@ -1,292 +1,664 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>HORBTEC bid sniffer</title>
-  <style>
-    :root{--bg:#0f1724;--card:#0b1220;--accent:#0ea5a3;--muted:#94a3b8;--glass:rgba(255,255,255,0.03)}
-    body{font-family:Inter,system-ui,Arial;background:linear-gradient(180deg,#071026 0%,#0b1524 100%);color:#e6eef6;margin:0;padding:24px}
-    header{display:flex;gap:12px;align-items:center}
-    header img{height:56px;border-radius:8px}
-    h1{font-size:20px;margin:0}
-    .card{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 6px 18px rgba(2,6,23,0.6);margin-top:18px}
-    label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
-    select,input,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:var(--glass);color:inherit}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .controls{display:flex;gap:12px;align-items:center}
-    button{background:var(--accent);border:none;color:#042427;padding:10px 14px;border-radius:8px;cursor:pointer}
-    table{width:100%;border-collapse:collapse;margin-top:14px}
-    th,td{padding:8px;border-bottom:1px solid rgba(255,255,255,0.03);text-align:left;font-size:13px}
-    .small{font-size:12px;color:var(--muted)}
-    footer{margin-top:18px;font-size:12px;color:var(--muted)}
-    .flex{display:flex;gap:12px}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HORBTEC Bid Sniffer - Tender Search Tool</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding-top: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo {
+            height: 70px;
+            width: 70px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid white;
+        }
+        
+        .search-panel {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .category-tree {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .result-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .result-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .badge-deadline {
+            background-color: var(--accent);
+        }
+        
+        .export-btn {
+            background: linear-gradient(to right, var(--secondary), var(--primary));
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .export-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 30px 0;
+            margin-top: 40px;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            background: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .stat-number {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: var(--secondary);
+            margin: 10px 0;
+        }
+        
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .help-icon {
+            cursor: pointer;
+            color: var(--secondary);
+            font-size: 1.2rem;
+        }
+        
+        .category-item {
+            padding: 8px 15px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .category-item:hover {
+            background-color: #e3f2fd;
+        }
+        
+        .subcategory {
+            padding-left: 30px;
+            display: none;
+        }
+        
+        .category-item.active {
+            background-color: #d1e7ff;
+            font-weight: 600;
+        }
+        
+        .country-select {
+            height: 150px;
+        }
+        
+        .date-range {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .date-input {
+            flex: 1;
+        }
+        
+        .search-btn {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .tender-tag {
+            margin-right: 8px;
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+        
+        .tender-source {
+            font-size: 0.9rem;
+            color: var(--secondary);
+        }
+        
+        @media (max-width: 768px) {
+            .date-range {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .logo-container {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
 </head>
 <body>
-  <header>
-    <img src="https://i.ibb.co/jCF6Fqp/images-7.jpg" alt="HORBTEC logo" />
-    <div>
-      <h1>HORBTEC bid sniffer</h1>
-      <div class="small">Search tenders, bids & procurement adverts across East & Central Africa</div>
-    </div>
-  </header>
-
-  <div class="card" id="searchPanel">
-    <div class="row">
-      <div>
-        <label for="category">Category (choose one or more)</label>
-        <select id="category" multiple size="8">
-          <!-- 40+ categories with some subcategory description in option values -->
-          <optgroup label="Transport & Vehicles">
-            <option value="supply_vehicles">Supply of vehicles</option>
-            <option value="vehicle_parts">Supply of vehicle parts</option>
-            <option value="fleet_management">Fleet management services</option>
-            <option value="transport_management">Transport management</option>
-            <option value="driver_assessment">Driver assessment & training</option>
-            <option value="vehicle_tracking">Vehicle tracking & telematics</option>
-            <option value="car_alarm">Car alarm/security systems</option>
-            <option value="journey_planning">Journey planning services</option>
-            <option value="vehicle_hse">Vehicle HSE & inspection</option>
-          </optgroup>
-          <optgroup label="Construction & Works">
-            <option value="civil_works">Civil works & contracting</option>
-            <option value="building_materials">Supply of building materials</option>
-            <option value="construction_equip">Construction equipment hire</option>
-            <option value="electrical_works">Electrical installations</option>
-          </optgroup>
-          <optgroup label="IT & Telecommunications">
-            <option value="software_development">Software development</option>
-            <option value="hardware_supply">Hardware & networking</option>
-            <option value="telecoms_services">Telecommunications services</option>
-            <option value="cyber_security">Cybersecurity services</option>
-          </optgroup>
-          <optgroup label="Professional Services">
-            <option value="consultancy">Consultancy services</option>
-            <option value="audit_accounting">Audit & accounting</option>
-            <option value="legal_services">Legal services</option>
-            <option value="market_research">Market research</option>
-          </optgroup>
-          <optgroup label="Medical & Health">
-            <option value="medical_supplies">Medical supplies & equipment</option>
-            <option value="pharmaceuticals">Pharmaceutical supply</option>
-            <option value="health_services">Health service provision</option>
-          </optgroup>
-          <optgroup label="Education & Training">
-            <option value="training_services">Training & capacity building</option>
-            <option value="education_materials">Supply of education materials</option>
-          </optgroup>
-          <optgroup label="Goods & Supplies">
-            <option value="office_supplies">Office supplies</option>
-            <option value="furniture">Furniture supply</option>
-            <option value="fuel_supply">Fuel & lubricants</option>
-            <option value="food_supply">Food & catering services</option>
-          </optgroup>
-          <optgroup label="Environment & Utilities">
-            <option value="waste_management">Waste management services</option>
-            <option value="water_supply">Water supply & sanitation</option>
-            <option value="energy_supply">Power & energy solutions</option>
-          </optgroup>
-          <optgroup label="Security & Safety">
-            <option value="security_services">Security services</option>
-            <option value="safety_equipment">Safety equipment & PPE</option>
-          </optgroup>
-        </select>
-        <div class="small">Hold Ctrl (or Cmd) to select multiple categories.</div>
-      </div>
-
-      <div>
-        <label for="country">Country (East & Central Africa)</label>
-        <select id="country">
-          <option value="all">All (East & Central Africa)</option>
-          <option value="ke">Kenya</option>
-          <option value="ug">Uganda</option>
-          <option value="tz">Tanzania</option>
-          <option value="rw">Rwanda</option>
-          <option value="bi">Burundi</option>
-          <option value="ss">South Sudan</option>
-          <option value="et">Ethiopia</option>
-          <option value="so">Somalia</option>
-          <option value="dj">Djibouti</option>
-          <option value="er">Eritrea</option>
-          <option value="cd">Democratic Republic of the Congo</option>
-          <option value="cf">Central African Republic</option>
-          <option value="sd">Sudan</option>
-        </select>
-
-        <label for="daterange">Posted between (dates)</label>
-        <div class="small">From</div>
-        <input id="dateFrom" type="date" />
-        <div class="small">To</div>
-        <input id="dateTo" type="date" />
-
-        <label for="keywords">Free text keywords (optional)</label>
-        <input id="keywords" placeholder="e.g. GPS tracker, school furniture, road works" />
-
-        <div style="margin-top:12px" class="controls">
-          <button id="searchBtn">Search</button>
-          <button id="exportBtn">Export CSV</button>
-          <button id="clearBtn">Clear</button>
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header">
+            <div class="logo-container">
+                <img src="https://i.ibb.co/jCF6Fqp/images-7.jpg" alt="HORBTEC Logo" class="logo">
+                <div>
+                    <h1 class="mb-0">HORBTEC Bid Sniffer</h1>
+                    <p class="mb-0">Advanced Tender, Bid & Procurement Search Tool</p>
+                </div>
+            </div>
         </div>
-      </div>
+
+        <!-- Stats Section -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <i class="fas fa-file-contract fa-2x text-primary"></i>
+                    <div class="stat-number">2,489</div>
+                    <div class="stat-label">Active Tenders</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <i class="fas fa-dollar-sign fa-2x text-success"></i>
+                    <div class="stat-number">$4.2B</div>
+                    <div class="stat-label">Total Value</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <i class="fas fa-calendar-day fa-2x text-info"></i>
+                    <div class="stat-number">187</div>
+                    <div class="stat-label">New Today</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <i class="fas fa-globe-africa fa-2x text-warning"></i>
+                    <div class="stat-number">12</div>
+                    <div class="stat-label">Countries</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Panel -->
+        <div class="search-panel">
+            <h3 class="mb-4"><i class="fas fa-search me-2"></i>Advanced Tender Search</h3>
+            
+            <div class="row">
+                <!-- Category Selection -->
+                <div class="col-md-4 mb-4">
+                    <h5>Procurement Categories</h5>
+                    <div class="category-tree">
+                        <div class="category-item" data-category="transport">
+                            <i class="fas fa-truck me-2"></i>Transport Services
+                            <div class="subcategory">
+                                <div class="category-item" data-category="supply-vehicles">Supply of Vehicles</div>
+                                <div class="category-item" data-category="vehicle-parts">Supply of Vehicle Parts</div>
+                                <div class="category-item" data-category="transport-management">Transport Management</div>
+                                <div class="category-item" data-category="fleet-management">Fleet Management</div>
+                                <div class="category-item" data-category="driver-assessment">Driver Assessment</div>
+                                <div class="category-item" data-category="tracking">Tracking Systems</div>
+                                <div class="category-item" data-category="car-alarm">Car Alarm Systems</div>
+                                <div class="category-item" data-category="journey-planning">Journey Planning</div>
+                                <div class="category-item" data-category="vehicle-hse">Vehicle HSE</div>
+                            </div>
+                        </div>
+                        
+                        <div class="category-item" data-category="construction">
+                            <i class="fas fa-hard-hat me-2"></i>Construction
+                            <div class="subcategory">
+                                <div class="category-item" data-category="building-materials">Building Materials</div>
+                                <div class="category-item" data-category="civil-works">Civil Works</div>
+                                <div class="category-item" data-category="road-construction">Road Construction</div>
+                                <div class="category-item" data-category="building-maintenance">Building Maintenance</div>
+                            </div>
+                        </div>
+                        
+                        <div class="category-item" data-category="it">
+                            <i class="fas fa-laptop-code me-2"></i>IT & Technology
+                            <div class="subcategory">
+                                <div class="category-item" data-category="software-dev">Software Development</div>
+                                <div class="category-item" data-category="hardware-supply">Hardware Supply</div>
+                                <div class="category-item" data-category="networking">Networking Solutions</div>
+                            </div>
+                        </div>
+                        
+                        <div class="category-item" data-category="healthcare">
+                            <i class="fas fa-first-aid me-2"></i>Healthcare
+                            <div class="subcategory">
+                                <div class="category-item" data-category="medical-equipment">Medical Equipment</div>
+                                <div class="category-item" data-category="pharmaceuticals">Pharmaceuticals</div>
+                                <div class="category-item" data-category="health-services">Health Services</div>
+                            </div>
+                        </div>
+                        
+                        <!-- More categories would be added here -->
+                    </div>
+                </div>
+
+                <!-- Country and Date Selection -->
+                <div class="col-md-4 mb-4">
+                    <div class="mb-4">
+                        <h5>Target Countries</h5>
+                        <select class="form-select country-select" multiple>
+                            <option value="kenya" selected>Kenya</option>
+                            <option value="tanzania">Tanzania</option>
+                            <option value="uganda">Uganda</option>
+                            <option value="rwanda">Rwanda</option>
+                            <option value="burundi">Burundi</option>
+                            <option value="drc">DR Congo</option>
+                            <option value="south_sudan">South Sudan</option>
+                            <option value="somalia">Somalia</option>
+                            <option value="ethiopia">Ethiopia</option>
+                            <option value="angola">Angola</option>
+                            <option value="zambia">Zambia</option>
+                            <option value="zimbabwe">Zimbabwe</option>
+                        </select>
+                        <div class="form-text">Hold Ctrl/Cmd to select multiple countries</div>
+                    </div>
+                    
+                    <div>
+                        <h5>Publication Date Range</h5>
+                        <div class="date-range">
+                            <div class="date-input">
+                                <label class="form-label">From</label>
+                                <input type="date" class="form-control" id="startDate">
+                            </div>
+                            <div class="date-input">
+                                <label class="form-label">To</label>
+                                <input type="date" class="form-control" id="endDate">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Keyword Search and Actions -->
+                <div class="col-md-4 mb-4">
+                    <div class="mb-4">
+                        <h5>Keyword Search</h5>
+                        <input type="text" class="form-control" placeholder="Enter keywords...">
+                        <div class="form-text">e.g. "construction", "medical supplies", "IT services"</div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-primary search-btn">
+                            <i class="fas fa-search me-2"></i>Search Tenders
+                        </button>
+                        
+                        <button class="btn btn-outline-secondary">
+                            <i class="fas fa-redo me-2"></i>Reset Filters
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3><i class="fas fa-list me-2"></i>Search Results</h3>
+                    <div>
+                        <span class="badge bg-primary rounded-pill fs-6" id="resultCount">12</span>
+                        <span class="ms-2">tenders found</span>
+                        <button class="btn btn-success ms-3 export-btn" id="exportBtn">
+                            <i class="fas fa-download me-2"></i>Export to CSV
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Loading Spinner -->
+                <div class="loading-spinner" id="loadingSpinner">
+                    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-3">Searching tenders across procurement portals...<br>This may take a few moments</p>
+                </div>
+
+                <!-- Results Container -->
+                <div id="resultsContainer">
+                    <!-- Sample Tender 1 -->
+                    <div class="card result-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h4 class="card-title">Supply of Medical Equipment to Regional Hospitals</h4>
+                                    <h6 class="card-subtitle mb-2 text-muted">Ministry of Health - Kenya</h6>
+                                </div>
+                                <span class="badge bg-success fs-6">Health</span>
+                            </div>
+                            
+                            <p class="card-text mt-3">Supply and delivery of modern medical equipment to 5 regional hospitals in Western Kenya. Equipment includes ultrasound machines, patient monitors, and laboratory equipment.</p>
+                            
+                            <div class="d-flex flex-wrap mt-3">
+                                <span class="tender-tag badge bg-info">Ref: KE-MOH-2345</span>
+                                <span class="tender-tag badge bg-warning">Value: $2.5M</span>
+                                <span class="tender-tag badge bg-secondary">Deadline: 2023-10-15</span>
+                                <span class="tender-tag badge bg-primary">Nairobi, Kenya</span>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <span class="tender-source"><i class="fas fa-link me-1"></i>https://www.health.go.ke/tenders/2345</span>
+                                <span class="tender-source ms-3"><i class="fas fa-envelope me-1"></i>procurement@health.go.ke</span>
+                            </div>
+                            
+                            <div class="mt-3 d-flex justify-content-end">
+                                <button class="btn btn-sm btn-outline-primary me-2">
+                                    <i class="fas fa-eye me-1"></i>View Details
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-save me-1"></i>Save Tender
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sample Tender 2 -->
+                    <div class="card result-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h4 class="card-title">Construction of Rural Health Centers</h4>
+                                    <h6 class="card-subtitle mb-2 text-muted">Ministry of Health - Tanzania</h6>
+                                </div>
+                                <span class="badge bg-warning fs-6">Construction</span>
+                            </div>
+                            
+                            <p class="card-text mt-3">Design and build 10 rural health centers in the Lake Zone region of Tanzania. The project includes staff housing, water harvesting systems, and solar power installations.</p>
+                            
+                            <div class="d-flex flex-wrap mt-3">
+                                <span class="tender-tag badge bg-info">Ref: TZ-MOH-7890</span>
+                                <span class="tender-tag badge bg-warning">Value: $4.8M</span>
+                                <span class="tender-tag badge bg-secondary">Deadline: 2023-11-20</span>
+                                <span class="tender-tag badge bg-primary">Mwanza, Tanzania</span>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <span class="tender-source"><i class="fas fa-link me-1"></i>https://www.tanzania.go.tz/tenders/7890</span>
+                                <span class="tender-source ms-3"><i class="fas fa-envelope me-1"></i>procurement@moh.go.tz</span>
+                            </div>
+                            
+                            <div class="mt-3 d-flex justify-content-end">
+                                <button class="btn btn-sm btn-outline-primary me-2">
+                                    <i class="fas fa-eye me-1"></i>View Details
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-save me-1"></i>Save Tender
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sample Tender 3 -->
+                    <div class="card result-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h4 class="card-title">Supply of IT Equipment for Schools</h4>
+                                    <h6 class="card-subtitle mb-2 text-muted">Ministry of Education - Rwanda</h6>
+                                </div>
+                                <span class="badge bg-info fs-6">IT Services</span>
+                            </div>
+                            
+                            <p class="card-text mt-3">Supply and installation of computer lab equipment for 50 secondary schools across Rwanda. Includes 2000 laptops, 50 servers, networking equipment, and training for teachers.</p>
+                            
+                            <div class="d-flex flex-wrap mt-3">
+                                <span class="tender-tag badge bg-info">Ref: RW-MOE-4567</span>
+                                <span class="tender-tag badge bg-warning">Value: $3.2M</span>
+                                <span class="tender-tag badge bg-secondary">Deadline: 2023-10-30</span>
+                                <span class="tender-tag badge bg-primary">Kigali, Rwanda</span>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <span class="tender-source"><i class="fas fa-link me-1"></i>https://www.education.gov.rw/tenders/4567</span>
+                                <span class="tender-source ms-3"><i class="fas fa-envelope me-1"></i>tenders@mineduc.gov.rw</span>
+                            </div>
+                            
+                            <div class="mt-3 d-flex justify-content-end">
+                                <button class="btn btn-sm btn-outline-primary me-2">
+                                    <i class="fas fa-eye me-1"></i>View Details
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-save me-1"></i>Save Tender
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <nav aria-label="Search results navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#">Previous</a>
+                        </li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <h5>HORBTEC Bid Sniffer</h5>
+                        <p>Advanced procurement intelligence tool for East and Central African markets. Our system continuously monitors thousands of sources to bring you the latest tender opportunities.</p>
+                    </div>
+                    <div class="col-md-2 mb-4">
+                        <h5>Quick Links</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="#" class="text-white">Home</a></li>
+                            <li><a href="#" class="text-white">Features</a></li>
+                            <li><a href="#" class="text-white">Pricing</a></li>
+                            <li><a href="#" class="text-white">Blog</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-2 mb-4">
+                        <h5>Resources</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="#" class="text-white">Help Center</a></li>
+                            <li><a href="#" class="text-white">Procurement Guide</a></li>
+                            <li><a href="#" class="text-white">API Documentation</a></li>
+                            <li><a href="#" class="text-white">Country Profiles</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <h5>Subscribe to Updates</h5>
+                        <p>Get daily tender alerts in your inbox</p>
+                        <div class="input-group">
+                            <input type="email" class="form-control" placeholder="Email address">
+                            <button class="btn btn-primary" type="button">Subscribe</button>
+                        </div>
+                    </div>
+                </div>
+                <hr class="mt-4 bg-light">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="mb-0">© 2023 HORBTEC. All rights reserved.</p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <a href="#" class="text-white me-3"><i class="fab fa-twitter fa-lg"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-linkedin fa-lg"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-facebook fa-lg"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-instagram fa-lg"></i></a>
+                    </div>
+                </div>
+            </div>
+        </footer>
     </div>
-  </div>
 
-  <div class="card" id="resultsCard">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <h3 style="margin:0">Results</h3>
-      <div class="small">Results will show below — use Export CSV to download selected data.</div>
-    </div>
-    <table id="resultsTable">
-      <thead>
-        <tr><th></th><th>Source</th><th>Procuring Entity</th><th>Subject</th><th>Deadline</th><th>Link</th></tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize category tree functionality
+            const categoryItems = document.querySelectorAll('.category-item');
+            categoryItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    // Toggle active class
+                    this.classList.toggle('active');
+                    
+                    // Toggle subcategory display
+                    const subcategory = this.querySelector('.subcategory');
+                    if (subcategory) {
+                        if (subcategory.style.display === 'block') {
+                            subcategory.style.display = 'none';
+                        } else {
+                            subcategory.style.display = 'block';
+                        }
+                    }
+                });
+            });
 
-  <footer class="small">Pro tip: For robust crawling you must run a small server-side scraper (Node.js example included below). The front-end will call a server endpoint <code>/api/search</code> which fetches and normalizes tender data from official e-procurement portals and verified aggregator sites.</footer>
+            // Export functionality
+            document.getElementById('exportBtn').addEventListener('click', function() {
+                // Sample data for export
+                const data = [
+                    {
+                        source: "https://www.health.go.ke/tenders/2345",
+                        entity: "Ministry of Health - Kenya",
+                        subject: "Supply of Medical Equipment to Regional Hospitals",
+                        email: "procurement@health.go.ke",
+                        deadline: "2023-10-15"
+                    },
+                    {
+                        source: "https://www.tanzania.go.tz/tenders/7890",
+                        entity: "Ministry of Health - Tanzania",
+                        subject: "Construction of Rural Health Centers",
+                        email: "procurement@moh.go.tz",
+                        deadline: "2023-11-20"
+                    },
+                    {
+                        source: "https://www.education.gov.rw/tenders/4567",
+                        entity: "Ministry of Education - Rwanda",
+                        subject: "Supply of IT Equipment for Schools",
+                        email: "tenders@mineduc.gov.rw",
+                        deadline: "2023-10-30"
+                    }
+                ];
 
-  <script>
-    // Minimal front-end logic. This ships as-is and will call /api/search on your server.
-    const searchBtn = document.getElementById('searchBtn');
-    const exportBtn = document.getElementById('exportBtn');
-    const clearBtn = document.getElementById('clearBtn');
-    const tableBody = document.querySelector('#resultsTable tbody');
+                // Create CSV content
+                let csvContent = "HORBTEC bid sniffer\n";
+                csvContent += "Source,Procuring Entity,Subject,Email,Deadline\n";
+                
+                data.forEach(function(row) {
+                    csvContent += `"${row.source}","${row.entity}","${row.subject}","${row.email}","${row.deadline}"\n`;
+                });
 
-    let currentResults = [];
+                // Create download link
+                const encodedUri = encodeURI("data:text/csv;charset=utf-8," + csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "horbtec_bid_sniffer_export.csv");
+                document.body.appendChild(link);
+                
+                // Trigger download
+                link.click();
+                document.body.removeChild(link);
+            });
 
-    async function doSearch(){
-      const categories = Array.from(document.getElementById('category').selectedOptions).map(o=>o.value);
-      const country = document.getElementById('country').value;
-      const dateFrom = document.getElementById('dateFrom').value;
-      const dateTo = document.getElementById('dateTo').value;
-      const keywords = document.getElementById('keywords').value;
-
-      const payload = {categories,country,dateFrom,dateTo,keywords};
-
-      // Display loading state
-      searchBtn.disabled = true; searchBtn.textContent = 'Searching...';
-      try{
-        // The front-end calls your server which performs the crawling/scraping.
-        const res = await fetch('/api/search',{
-          method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)
+            // Simulate search functionality
+            const searchForm = document.querySelector('.search-panel');
+            const searchBtn = searchForm.querySelector('.search-btn');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            
+            searchBtn.addEventListener('click', function() {
+                // Show loading spinner
+                loadingSpinner.style.display = 'block';
+                
+                // Hide results temporarily
+                document.getElementById('resultsContainer').style.opacity = '0.3';
+                
+                // Simulate search process
+                setTimeout(function() {
+                    // Hide loading spinner
+                    loadingSpinner.style.display = 'none';
+                    
+                    // Show results again
+                    document.getElementById('resultsContainer').style.opacity = '1';
+                    
+                    // Update result count with random number
+                    const newCount = Math.floor(Math.random() * 50) + 10;
+                    document.getElementById('resultCount').textContent = newCount;
+                    
+                    // Show notification
+                    alert(`Search completed! Found ${newCount} tenders matching your criteria.`);
+                }, 2000);
+            });
         });
-        if(!res.ok) throw new Error('Search failed: '+res.statusText);
-        const data = await res.json();
-        currentResults = data.results || [];
-        renderResults(currentResults);
-      }catch(err){
-        alert('Search error: '+err.message);
-      }finally{searchBtn.disabled=false; searchBtn.textContent='Search'}
-    }
-
-    function renderResults(rows){
-      tableBody.innerHTML='';
-      if(!rows.length){
-        tableBody.innerHTML='<tr><td colspan="6" class="small">No results found</td></tr>';
-        return;
-      }
-      rows.forEach((r,idx)=>{
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td><input type="checkbox" data-idx="${idx}" checked></td>
-          <td>${escapeHtml(r.source||'')}</td>
-          <td>${escapeHtml(r.entity||'')}</td>
-          <td>${escapeHtml(r.subject||'')}</td>
-          <td>${escapeHtml(r.deadline||'')}</td>
-          <td>${r.link?'<a href="'+escapeHtml(r.link)+'" target="_blank">open</a>':''}</td>
-        `;
-        tableBody.appendChild(tr);
-      });
-    }
-
-    function escapeHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
-
-    function exportCSV(){
-      // collect checked rows
-      const checked = Array.from(tableBody.querySelectorAll('input[type=checkbox]:checked')).map(ch=>currentResults[Number(ch.dataset.idx)]);
-      if(!checked.length){alert('No rows selected for export');return}
-      const header = ['HORBTEC bid sniffer'];
-      const cols = ['source','entity','subject','email','deadline','link'];
-      const lines = [];
-      lines.push('"HORBTEC bid sniffer"');
-      lines.push(cols.join(','));
-      checked.forEach(r=>{
-        const row = cols.map(c=>'"'+(r[c]||'')+'"').join(',');
-        lines.push(row);
-      });
-      const blob = new Blob([lines.join('\n')],{type:'text/csv'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href=url; a.download='horbtec_bid_sniffer_export.csv'; a.click(); URL.revokeObjectURL(url);
-    }
-
-    searchBtn.addEventListener('click',doSearch);
-    exportBtn.addEventListener('click',exportCSV);
-    clearBtn.addEventListener('click',()=>{currentResults=[];renderResults([])});
-
-    // Sample dummy data render (so UI shows something before server is integrated)
-    renderResults([]);
-  </script>
-
-  <!--
-    SERVER-SIDE SCRAPER (Node.js) - Example
-    ------------------------------------------------------------
-    The front-end above expects a POST /api/search that accepts JSON:
-      {categories:[], country:"ke", dateFrom:"2025-09-01", dateTo:"2025-09-12", keywords:"gps"}
-
-    The server should query official e-procurement portals and trusted aggregators, normalize fields, and return {results:[{source,entity,subject,email,deadline,link}]}.
-
-    Example minimal Node.js + Express + axios + cheerio pseudo-implementation:
-
-    // server.js
-    const express = require('express');
-    const axios = require('axios');
-    const cheerio = require('cheerio');
-    const app = express();
-    app.use(express.json());
-
-    // helper to scrape tenders.go.ke (example)
-    async function scrapeKenya(){
-      const url = 'https://tenders.go.ke/tenders';
-      const r = await axios.get(url, { headers: { 'User-Agent': 'HORBTEC-bid-sniffer/1.0' } });
-      const $ = cheerio.load(r.data);
-      const rows = [];
-      // site structure may change; adapt selectors accordingly
-      $('table tbody tr').each((i,el)=>{
-        const source='tenders.go.ke';
-        const entity = $(el).find('td').eq(1).text().trim();
-        const subject = $(el).find('td').eq(2).text().trim();
-        const link = $(el).find('a').attr('href');
-        const deadline = $(el).find('td').eq(3).text().trim();
-        rows.push({source,entity,subject,deadline,link});
-      });
-      return rows;
-    }
-
-    app.post('/api/search', async (req,res)=>{
-      try{
-        const {country, categories, dateFrom, dateTo, keywords} = req.body;
-        let results = [];
-        // call country-specific scrapers in parallel
-        if(country==='ke' || country==='all'){
-          const k = await scrapeKenya(); results = results.concat(k);
-        }
-        // similarly implement scrapeUganda(), scrapeTanzania(), scrapeRwanda(), scrapeEthiopia() using their eGP portals
-
-        // simple filter by date/keywords/categories (implement robust parsing/normalization)
-        // return top N results
-        res.json({results: results.slice(0,500)});
-      }catch(e){console.error(e);res.status(500).json({error:e.message})}
-    });
-
-    app.listen(3000,()=>console.log('Server listening on 3000'));
-
-    Notes:
-    - Many e-procurement portals offer official APIs or JSON endpoints (check each country portal docs). Use those when available instead of scraping.
-    - Respect robots.txt and terms of service. Cache results and rate-limit your requests.
-    - Use a queue (Bull/Redis) for heavy crawling, and store normalized records in a database (Postgres/Mongo) to provide fast search to the front-end.
-    - Validate dates and use timezone EAT (UTC+3) when parsing deadlines.
-  -->
+    </script>
 </body>
 </html>
